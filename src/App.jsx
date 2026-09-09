@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
+import Header from './components/Header'
 import Sidebar from './components/Sidebar'
 import Markdown from './components/Markdown'
 import TopicNav from './components/TopicNav'
 import { folders, getAdjacentTopics, getTopics, loadTopic } from './content/loader'
+import { useTheme } from './hooks/useTheme'
 import './App.css'
 
 const initialFolder = folders[0] ?? null
@@ -13,6 +15,8 @@ function App() {
   const [topic, setTopic] = useState(initialTopic)
   const [content, setContent] = useState('')
   const [loading, setLoading] = useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [theme, toggleTheme] = useTheme()
   const contentPaneRef = useRef(null)
 
   useEffect(() => {
@@ -49,24 +53,46 @@ function App() {
   }
 
   return (
-    <div className="layout">
-      <Sidebar
-        folders={folders}
-        activeFolder={folder}
-        activeTopic={topic}
-        onSelectTopic={handleSelectTopic}
+    <>
+      <a className="skip-link" href="#main-content">
+        Skip to content
+      </a>
+      <Header
+        sidebarOpen={sidebarOpen}
+        onToggleSidebar={() => setSidebarOpen((v) => !v)}
+        theme={theme}
+        onToggleTheme={toggleTheme}
+        onLogoClick={() => {
+          setSidebarOpen(false)
+          handleSelectTopic(initialFolder, initialTopic)
+        }}
       />
-      <main className="content-pane" ref={contentPaneRef}>
-        {loading ? (
-          <p className="status">Loading…</p>
-        ) : (
-          <>
-            <Markdown>{content}</Markdown>
-            <TopicNav prev={prev} next={next} onSelectTopic={handleSelectTopic} />
-          </>
-        )}
-      </main>
-    </div>
+      <div className="layout">
+        <Sidebar
+          folders={folders}
+          activeFolder={folder}
+          activeTopic={topic}
+          onSelectTopic={handleSelectTopic}
+          open={sidebarOpen}
+          onClose={() => setSidebarOpen(false)}
+        />
+        <main className="content-pane" id="main-content" tabIndex={-1} ref={contentPaneRef}>
+          {loading ? (
+            <div className="skeleton" aria-hidden="true">
+              <div className="skeleton-line skeleton-title" />
+              <div className="skeleton-line" />
+              <div className="skeleton-line" />
+              <div className="skeleton-line skeleton-short" />
+            </div>
+          ) : (
+            <>
+              <Markdown>{content}</Markdown>
+              <TopicNav prev={prev} next={next} onSelectTopic={handleSelectTopic} />
+            </>
+          )}
+        </main>
+      </div>
+    </>
   )
 }
 

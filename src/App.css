@@ -16,3 +16,41 @@
   padding: 48px 24px;
   color: var(--text);
 }
+
+.content-pane:focus-visible {
+  outline: none;
+}
+
+.skeleton {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 48px 24px;
+}
+
+.skeleton-line {
+  height: 16px;
+  margin-bottom: 12px;
+  border-radius: 6px;
+  background: var(--code-bg);
+  animation: skeleton-pulse 1.4s ease-in-out infinite;
+}
+
+.skeleton-title {
+  width: 55%;
+  height: 32px;
+  margin-bottom: 24px;
+}
+
+.skeleton-short {
+  width: 70%;
+}
+
+@keyframes skeleton-pulse {
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}

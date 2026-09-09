@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { getTopics } from '../content/loader'
 import './Sidebar.css'
 
-function Sidebar({ folders, activeFolder, activeTopic, onSelectTopic }) {
+function Sidebar({ folders, activeFolder, activeTopic, onSelectTopic, open, onClose }) {
   const [openFolders, setOpenFolders] = useState(() => new Set([activeFolder]))
 
   function toggleFolder(folder) {
@@ -17,43 +17,53 @@ function Sidebar({ folders, activeFolder, activeTopic, onSelectTopic }) {
     })
   }
 
+  function handleSelectTopic(folder, t) {
+    onSelectTopic(folder, t)
+    onClose?.()
+  }
+
   return (
-    <aside className="sidebar">
-      {folders.map((folder) => {
-        const isOpen = openFolders.has(folder)
-        return (
-          <div className="folder-section" key={folder}>
-            <button
-              type="button"
-              className="folder-header"
-              aria-expanded={isOpen}
-              onClick={() => toggleFolder(folder)}
-            >
-              <span className={`chevron${isOpen ? ' open' : ''}`} aria-hidden="true">
-                ▸
-              </span>
-              {folder}
-            </button>
-            {isOpen && (
-              <nav className="topic-list">
-                {getTopics(folder).map((t) => (
-                  <button
-                    key={t}
-                    type="button"
-                    className={`topic-item${
-                      folder === activeFolder && t === activeTopic ? ' active' : ''
-                    }`}
-                    onClick={() => onSelectTopic(folder, t)}
-                  >
-                    {t}
-                  </button>
-                ))}
-              </nav>
-            )}
-          </div>
-        )
-      })}
-    </aside>
+    <>
+      {open && <div className="sidebar-backdrop" onClick={onClose} aria-hidden="true" />}
+      <aside className={`sidebar${open ? ' open' : ''}`}>
+        {folders.map((folder) => {
+          const isOpen = openFolders.has(folder)
+          return (
+            <div className="folder-section" key={folder}>
+              <button
+                type="button"
+                className="folder-header"
+                aria-expanded={isOpen}
+                onClick={() => toggleFolder(folder)}
+              >
+                <span className={`chevron${isOpen ? ' open' : ''}`} aria-hidden="true">
+                  ▸
+                </span>
+                {folder}
+              </button>
+              {isOpen && (
+                <nav className="topic-list">
+                  {getTopics(folder).map((t) => {
+                    const isActive = folder === activeFolder && t === activeTopic
+                    return (
+                      <button
+                        key={t}
+                        type="button"
+                        className={`topic-item${isActive ? ' active' : ''}`}
+                        aria-current={isActive ? 'page' : undefined}
+                        onClick={() => handleSelectTopic(folder, t)}
+                      >
+                        {t}
+                      </button>
+                    )
+                  })}
+                </nav>
+              )}
+            </div>
+          )
+        })}
+      </aside>
+    </>
   )
 }
 
