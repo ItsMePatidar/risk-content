@@ -1,0 +1,18 @@
+.layout {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  align-items: stretch;
+  text-align: left;
+}
+
+.content-pane {
+  flex: 1;
+  min-width: 0;
+  overflow-y: auto;
+}
+
+.status {
+  padding: 48px 24px;
+  color: var(--text);
+}
